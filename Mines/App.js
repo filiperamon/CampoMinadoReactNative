@@ -1,22 +1,25 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Alert, TouchableWithoutFeedback} from 'react-native';
+import {StyleSheet, Text, View, Alert} from 'react-native';
 import params from './src/Params'
 import MineField from './src/componentes/MineField'
-import {   createMinedBoard,
-          cloneBoard,
-          openField,
-          hadExplosion,
-          wonGame,
-          showMines
+import Header from './src/componentes/Header'
+import LevelSelection from './src/screens/LevelSelection'
+import {
+  createMinedBoard,
+  cloneBoard,
+  openField,
+  hadExplosion,
+  wonGame,
+  showMines,
+  invertFlag,
+  flagsUsed
 } from './src/Service'
 
 export default class App extends Component {
 
   constructor(props) {
     super(props)
-    console.log('Entrou no construtor')
     this.state = this.createState()
-    console.log(this.state.board)
   }
 
   minesAmount = () => {
@@ -31,7 +34,8 @@ export default class App extends Component {
     return {
       board: createMinedBoard(rows, cols, this.minesAmount()),
       won: false,
-      lost: false
+      lost: false,
+      showLevelSelection: false,
     }
   }
 
@@ -41,31 +45,48 @@ export default class App extends Component {
     const lost = hadExplosion(board)
     const won = wonGame(board)
 
-    if(lost){
+    if (lost) {
       showMines(board)
-      Alert.alert('Perdeu', 'Pato')
+      Alert.alert('Perdeeeeu!', 'Que buuuurro!')
     }
 
-    if(won){
-      Alert.alert('Parabens', 'Voce Venceu!')
+    if (won) {
+      Alert.alert('Parabéns', 'Você Venceu!')
     }
 
-    this.setState({
-      board, lost, won
-    })
+    this.setState({ board, lost, won })
+  }
+
+  onSelectField = (row, column) => {
+    const board = cloneBoard(this.state.board)
+    invertFlag(board, row, column)
+    const won = wonGame(board)
+
+    if (won) {
+      Alert.alert('Parabéns', 'Você Venceu!')
+    }
+
+    this.setState({ board, won })
+  }
+
+  onLevelSelected = level => {
+    params.difficultLevel = level
+    this.setState(this.createState())
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <TouchableWithoutFeedback>
-            <Text style={{fontSize: 40, backgroundColor: '#eee'}} onPress={() => this.setState(this.createState())}>
-              Clique para Novo Jogo 
-            </Text>
-        </TouchableWithoutFeedback>
+        <LevelSelection isVisible={this.state.showLevelSelection}
+          onLevelSelected={this.onLevelSelected}
+          onCancel={() => this.setState({ showLevelSelection: false })} />
+        <Header flagsLeft={this.minesAmount() - flagsUsed(this.state.board)}
+          onNewGame={() => this.setState(this.createState())} 
+          onFlagPress={() => this.setState({ showLevelSelection: true })} />
         <View style={styles.board}>
           <MineField board={this.state.board} 
-              onOpenField={this.onOpenField}/>
+            onOpenField={this.onOpenField}
+            onSelectField={this.onSelectField} />
         </View>
       </View>
     );
@@ -75,10 +96,10 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   board: {
     alignItems: 'center',
-    backgroundColor: '#AAA',
+    backgroundColor: '#AAA'
   }
 });
