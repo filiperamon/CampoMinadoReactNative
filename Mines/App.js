@@ -22,6 +22,28 @@ export default class App extends Component {
     this.state = this.createState()
   }
 
+  componentDidMount() {
+    setInterval(this.tick, 1000);
+  }
+
+
+  tick = () => {
+    let timer = this.state.timer
+    let minute = this.state.minute
+
+    if(timer == 60) {
+      timer = 0
+      minute = minute + 1
+    } else {
+      timer = timer + 1
+    }
+
+    this.setState({
+      timer, minute
+    });
+  }
+
+
   minesAmount = () => {
     const cols = params.getColumnsAmount()
     const rows = params.getRowsAmount()
@@ -36,6 +58,8 @@ export default class App extends Component {
       won: false,
       lost: false,
       showLevelSelection: false,
+      timer: 0,
+      minute: 0,
     }
   }
 
@@ -47,7 +71,7 @@ export default class App extends Component {
 
     if (lost) {
       showMines(board)
-      Alert.alert('Perdeeeeu!', 'Que buuuurro!')
+      Alert.alert('Perdeeeeu!', 'Tente novamente!')
     }
 
     if (won) {
@@ -76,13 +100,15 @@ export default class App extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={styles.container}>        
         <LevelSelection isVisible={this.state.showLevelSelection}
           onLevelSelected={this.onLevelSelected}
           onCancel={() => this.setState({ showLevelSelection: false })} />
-        <Header flagsLeft={this.minesAmount() - flagsUsed(this.state.board)}
+        <Header flagsLeft={this.minesAmount() - flagsUsed(this.state.board) + 1}
           onNewGame={() => this.setState(this.createState())} 
-          onFlagPress={() => this.setState({ showLevelSelection: true })} />
+          onFlagPress={() => this.setState({ showLevelSelection: true })} 
+          timer={this.state.timer}
+          minute={this.state.minute}/>
         <View style={styles.board}>
           <MineField board={this.state.board} 
             onOpenField={this.onOpenField}

@@ -1,5 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native'
+import ButtonLevel from '../componentes/ButtonLevel'
 
 export default props => {
     return (
@@ -10,20 +11,12 @@ export default props => {
                 <View style={styles.frame}>
                     <View style={styles.container}>
                         <Text style={styles.title}>Selecione o Nível</Text>
+                        <ButtonLevel onLevelSelected={ () => props.onLevelSelected(0.1) } label='Fácil' success/>
+                        <ButtonLevel onLevelSelected={ () => props.onLevelSelected(0.2) } label='Intermediário' warning/>
+                        <ButtonLevel onLevelSelected={ () => props.onLevelSelected(0.3) } label='Difícil' danger/>
                         <TouchableOpacity
-                            style={[styles.button, styles.bgEasy]}
-                            onPress={() => props.onLevelSelected(0.1)}>
-                            <Text style={styles.buttonLabel}>Fácil</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.bgNormal]}
-                            onPress={() => props.onLevelSelected(0.2)}>
-                            <Text style={styles.buttonLabel}>Intermediário</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, styles.bgHard]}
                             onPress={() => props.onLevelSelected(0.3)}>
-                            <Text style={styles.buttonLabel}>Difícil</Text>
+                            <ButtonLevel label='Difícil'/>
                         </TouchableOpacity>
                     </View>
                 </View>
